@@ -1,5 +1,6 @@
 import express, {request, response} from "express";
-import {z} from "zod";
+import {array, z} from "zod";
+import {createUserValidationSchema} from "./utils/validationSchemasZod";
 
 const app = express();
 app.use(express.json());
@@ -77,15 +78,22 @@ app.get('/api/users', (req, res) => {
 })
 
 app.post('/api/users', (req, res) => {
-    const parseResult = userSchema.safeParse(req.body)
+    const parseResult = createUserValidationSchema.safeParse(req.body);
 
+    // Handle validation failure and return detailed error messages
     if (!parseResult.success) {
-        return res.status(404).send({error: 'Invalid user data'})
+        return res.status(400).send({
+            error: 'Invalid user data in POST request',
+            details: parseResult.error.errors// Send Zod validation error messages
+        });
     }
-    const newUser = {id: Users1[Users1.length - 1].id + 1, ...parseResult.data}
-    Users1.push(newUser)
-    return res.status(201).send(newUser)
-})
+
+    const {username, displayName} = parseResult.data;
+
+    const newUser = {id: Users1[Users1.length - 1].id + 1, username, displayName};
+    Users1.push(newUser);
+    return res.status(201).send(newUser);
+});
 
 app.get('/api/users/:id', resolveIndexByUserId, (req, res) => {
     const {findUserIndex} = req;
@@ -98,11 +106,11 @@ app.put('/api/users/:id', resolveIndexByUserId, (req, res) => {
     const parseResult = userSchema.safeParse(req.body);
 
     if (!parseResult.success) {
-        return res.status(400).send({ error: 'Invalid user data' });
+        return res.status(400).send({error: 'Invalid user data'});
     }
 
-    const { findUserIndex } = req;
-    Users1[findUserIndex] = { id: Users1[findUserIndex].id, ...parseResult.data };
+    const {findUserIndex} = req;
+    Users1[findUserIndex] = {id: Users1[findUserIndex].id, ...parseResult.data};
     return res.sendStatus(200);
 });
 
@@ -119,12 +127,12 @@ app.patch('/api/users/:id', resolveIndexByUserId, (req, res) => {
 })
 
 app.delete('/api/users/:id', (req, res) => {
-    const {params :{id}} = req
+    const {params: {id}} = req
     const parsedId = parseInt(id)
-    if(isNaN(parsedId)) return res.sendStatus(400)
+    if (isNaN(parsedId)) return res.sendStatus(400)
 
     const findUserIndex = Users1.findIndex((user) => user.id === parsedId)
-    if(findUserIndex === -1) return res.sendStatus(404)
+    if (findUserIndex === -1) return res.sendStatus(404)
     Users1.splice(findUserIndex, 1)
     return res.sendStatus(200)
 })
