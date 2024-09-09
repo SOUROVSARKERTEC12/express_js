@@ -1,5 +1,5 @@
-import express, {request, response} from "express";
-import {array, z} from "zod";
+import express from "express";
+import { z} from "zod";
 import {createUserValidationSchema} from "./utils/validationSchemasZod";
 
 const app = express();
