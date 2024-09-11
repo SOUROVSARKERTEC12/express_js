@@ -2,10 +2,10 @@
   "name": "express_js",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon -L --exec babel-node server.js",
-    "start": "nodemon -L --exec babel-node server1.js"
+    "dev": "nodemon -L --exec babel-node src/server.js",
+    "start": "nodemon -L --exec babel-node src/server1.js"
   },
   "keywords": [],
   "author": "",
