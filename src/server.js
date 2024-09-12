@@ -1,10 +1,17 @@
 import express from "express";
 import routes from "./routes/index"
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 app.use(express.json())
+app.use(cookieParser("helloworld"))
 app.use(routes)
+
+app.get('/', (req, res) => {
+    res.cookie("hello", "world", {maxAge: 30000, signed: true})
+    res.status(201).send({message: "Welcome"})
+})
 
 const PORT = 3001;
 
